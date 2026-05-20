@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Memory Card Game</title>
+<style>
+    body {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        background: #f6f9ff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: rgb(0, 0, 0);
+        margin: 0;
+    }
+    header{
+        width: 100%;
+        padding: 20px;
+        padding-top: 30px;
+        text-align: center;
+    }
+    header h1{
+        margin: 0;
+    }
+    .game {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(6, 150px);
+        gap: 10px;
+    }
+
+    .card {
+        width: 150px;
+        height: 200px;
+        perspective: 1000px;
+        cursor: pointer;
+    }
+
+    .inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+    }
+
+    .card.flip .inner {
+        transform: rotateY(180deg);
+    }
+
+    .front, .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        backface-visibility: hidden;
+    }
+
+    .front {
+        background: #e21010;
+    }
+
+    .back {
+        background: #e21010;;
+        transform: rotateY(180deg);
+    }
+</style>
+</head>
+<body>
+<header class="header">
+    <h1>Memory Game</h1>
+    <p>A project created for Farm Workers.</p>
+    <div class="move-count"> Moves: <span id="moves">0</span></div>
+</header>
+
+<div class="game" id="game"></div>
+
+<script>
+const cardTops = ["./imageFolder/4.jpg","./imageFolder/5.jpg",'./imageFolder/6.jpg','./imageFolder/7.jpg', './imageFolder/8.jpg', './imageFolder/9.jpg', './imageFolder/10.jpg', './imageFolder/11.jpg', './imageFolder/12.jpg', "./imageFolder/13.jpg", './imageFolder/14.jpg', "./imageFolder/15.jpg", "./imageFolder/16.jpg", "./imageFolder/17.jpg", "./imageFolder/18.jpg"];
+let cards = [...cardTops, ...cardTops]; // duplicate for pairs
+
+// Shuffle
+cards.sort(() => 0.5 - Math.random());
+
+const game = document.getElementById('game');
+
+let firstCard = null;
+let secondCard = null;
+let lock = false;
+let moves = 0;
+
+// Create cards
+cards.forEach(cardTops => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    card.innerHTML = `
+        <div class="inner">
+            <div class="front"><img src="./imageFolder/backImage.jpeg" width="100%" height="100%"></div>
+            <div class="back"><img src="${cardTops}" width="100%" height="100%"></div>
+        </div>
+    `;
+
+    card.addEventListener('click', () => flipCard(card, cardTops));
+    game.appendChild(card);
+});
+
+function flipCard(card, symbol) {
+    if (lock || card.classList.contains('flip')) return;
+
+    card.classList.add('flip');
+
+    if (!firstCard) {
+        firstCard = { card, symbol };
+        return;
+    }
+
+    secondCard = { card, symbol };
+    lock = true;
+
+    moves++;
+    document.getElementById('moves').textContent = moves;
+
+    if (firstCard.symbol === secondCard.symbol) {
+        resetTurn();
+    } else {
+        setTimeout(() => {
+            firstCard.card.classList.remove('flip');
+            secondCard.card.classList.remove('flip');
+            resetTurn();
+        }, 1000);
+    }
+}
+
+function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lock = false;
+}
+</script>
+
+</body>
+</html>
